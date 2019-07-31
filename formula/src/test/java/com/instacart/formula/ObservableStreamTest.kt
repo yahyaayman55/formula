@@ -29,11 +29,11 @@ class ObservableStreamTest {
     }
 
     private fun test(
-        builder: FormulaContext.UpdateBuilder<Int, Unit>.(state: Int) -> Unit
+        builder: UpdateBuilder<Int, Unit>.(state: Int) -> Unit
     ) = formula(builder).state(Unit).test()
 
     private fun formula(
-        builder: FormulaContext.UpdateBuilder<Int, Unit>.(state: Int) -> Unit
+        builder: UpdateBuilder<Int, Unit>.(state: Int) -> Unit
     ): Formula<Unit, Int, Unit, Int> {
         return object : Formula<Unit, Int, Unit, Int> {
 

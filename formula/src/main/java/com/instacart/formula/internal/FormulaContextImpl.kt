@@ -6,6 +6,7 @@ import com.instacart.formula.Evaluation
 import com.instacart.formula.Formula
 import com.instacart.formula.Transition
 import com.instacart.formula.Update
+import com.instacart.formula.UpdateBuilder
 import java.lang.IllegalStateException
 
 class FormulaContextImpl<State, Output> internal constructor(
@@ -37,66 +38,68 @@ class FormulaContextImpl<State, Output> internal constructor(
     }
 
     private fun wrapCallback(wrap: Transition.Factory.() -> Transition<State, Output>): () -> Unit {
-        ensureNotRunning()
         return {
             transitionCallback(wrap(Transition.Factory))
         }
     }
 
     private fun <UIEvent> wrapEventCallback(wrap: Transition.Factory.(UIEvent) -> Transition<State, Output>): (UIEvent) -> Unit {
-        ensureNotRunning()
-        return {
-            transitionCallback(wrap(Transition.Factory, it))
+        return { event ->
+            transitionCallback(wrap(Transition.Factory, event))
         }
     }
 
-    override fun callback(wrap: Transition.Factory.() -> Transition<State, Output>): () -> Unit {
+    private fun initOrFindPositionalCallback(): Callback {
         ensureNotRunning()
 
         val key = callbackCount
         callbacks.add(key)
-
-        val callback = delegate.initOrFindCallback(key)
-        callback.callback = wrapCallback(wrap)
         incrementCallbackCount()
+
+        return delegate.initOrFindCallback(key)
+    }
+
+    override fun callback(transition: Transition.Factory.() -> Transition<State, Output>): () -> Unit {
+        val callback = initOrFindPositionalCallback()
+        callback.callback = wrapCallback(transition)
         return callback
     }
 
     override fun optionalCallback(
         condition: Boolean,
-        wrap: Transition.Factory.() -> Transition<State, Output>
+        transition: Transition.Factory.() -> Transition<State, Output>
     ): (() -> Unit)? {
         return if (condition) {
-            callback(wrap)
+            callback(transition)
         } else {
             incrementCallbackCount()
             null
         }
     }
 
-    override fun <UIEvent> eventCallback(wrap: Transition.Factory.(UIEvent) -> Transition<State, Output>): (UIEvent) -> Unit {
+    override fun <UIEvent> eventCallback(transition: Transition.Factory.(UIEvent) -> Transition<State, Output>): (UIEvent) -> Unit {
         val key = callbackCount
         eventCallbacks.add(key)
+        incrementCallbackCount()
 
         val callback = delegate.initOrFindEventCallback<UIEvent>(key)
-        callback.callback = wrapEventCallback(wrap)
-        incrementCallbackCount()
+        callback.callback = wrapEventCallback(transition)
         return callback
     }
 
     override fun <UIEvent> optionalEventCallback(
         condition: Boolean,
-        wrap: Transition.Factory.(UIEvent) -> Transition<State, Output>
+        transition: Transition.Factory.(UIEvent) -> Transition<State, Output>
     ): ((UIEvent) -> Unit)? {
         return if (condition) {
-            eventCallback(wrap)
+            eventCallback(transition)
         } else {
             incrementCallbackCount()
             null
         }
     }
 
-    override fun callback(key: String, wrap: Transition.Factory.() -> Transition<State, Output>): () -> Unit {
+    override fun callback(key: String, transition: Transition.Factory.() -> Transition<State, Output>): () -> Unit {
         ensureNotRunning()
 
         if (key.isBlank()) {
@@ -110,13 +113,13 @@ class FormulaContextImpl<State, Output> internal constructor(
         callbacks.add(key)
 
         val callback = delegate.initOrFindCallback(key)
-        callback.callback = wrapCallback(wrap)
+        callback.callback = wrapCallback(transition)
         return callback
     }
 
     override fun <UIEvent> eventCallback(
         key: String,
-        wrap: Transition.Factory.(UIEvent) -> Transition<State, Output>
+        transition: Transition.Factory.(UIEvent) -> Transition<State, Output>
     ): (UIEvent) -> Unit {
         ensureNotRunning()
 
@@ -131,7 +134,7 @@ class FormulaContextImpl<State, Output> internal constructor(
         eventCallbacks.add(key)
 
         val callback = delegate.initOrFindEventCallback<UIEvent>(key)
-        callback.callback = wrapEventCallback(wrap)
+        callback.callback = wrapEventCallback(transition)
         return callback
     }
 
