@@ -1,5 +1,8 @@
 package com.instacart.formula
 
+/**
+ * A [Formula] that doesn't have internal state.
+ */
 abstract class StatelessFormula<Input, Output, RenderModel> : Formula<Input, Unit, Output, RenderModel> {
 
     final override fun initialState(input: Input) = Unit
