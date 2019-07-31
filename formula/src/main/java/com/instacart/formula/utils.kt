@@ -18,6 +18,7 @@ fun <T, R> cached(factory: (T) -> R): (T) -> R {
     }
 }
 
+@Deprecated("legacy utility function")
 fun <T> Flowable<(T) -> T>.reduce(initial: T): Flowable<T> {
     return this
         .scan(initial) { state, reducer ->
@@ -28,6 +29,7 @@ fun <T> Flowable<(T) -> T>.reduce(initial: T): Flowable<T> {
 }
 
 
+@Deprecated("legacy utility function")
 fun <T> Observable<(T) -> T>.reduce(initial: T): Observable<T> {
     return this
         .scan(initial) { state, reducer ->
