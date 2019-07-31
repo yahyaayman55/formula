@@ -34,7 +34,7 @@ data class Transition<out State, out Output> internal constructor(
          * Triggers a transition to new [State] that also can have an optional [Output].
          */
         fun <State, Output> transition(
-            state: State,
+            state: State? = null,
             output: Output? = null,
             sideEffects: List<SideEffect> = emptyList()
         ): Transition<State, Output> {
