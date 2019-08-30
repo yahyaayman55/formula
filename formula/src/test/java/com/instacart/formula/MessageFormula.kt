@@ -17,13 +17,13 @@ class MessageFormula : Formula<MessageFormula.Input, Int, MessageFormula.RenderM
             renderModel = RenderModel(
                 state = state,
                 triggerMessage = context.callback {
-                    state.withMessages {
+                    transition {
                         message(input.messageHandler, state)
                     }
                 },
                 incrementAndMessage = context.callback {
                     val newState = state + 1
-                    newState.withMessages {
+                    transition(newState) {
                         message(input.messageHandler, newState)
                     }
                 }
