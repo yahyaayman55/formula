@@ -1,7 +1,5 @@
 package com.instacart.formula
 
-import io.reactivex.Observable
-
 /**
  * A [Stream] defines an asynchronous event(s).
  *
