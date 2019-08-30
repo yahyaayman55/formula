@@ -18,7 +18,7 @@ class Update<Data : Any, Message>(
     )
 
     internal var handler: (Message) -> Unit = initial
-    internal var cancelable: Cancelable? = null
+    private var cancelable: Cancelable? = null
 
     internal fun start() {
         cancelable = stream.start(data) { message ->

@@ -1,9 +1,6 @@
 package com.instacart.formula.internal
 
-/**
- * Note: this class is not a data class because equality is based on instance and not [key].
- */
-class Callback(internal val key: Any): () -> Unit {
+class Callback(): () -> Unit {
     @PublishedApi internal var callback: (() -> Unit)? = null
 
     override fun invoke() {
