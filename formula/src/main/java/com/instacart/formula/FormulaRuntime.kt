@@ -32,19 +32,15 @@ class FormulaRuntime<Input : Any, State, RenderModel : Any>(
         ): Observable<RenderModel> {
             val threadChecker = ThreadChecker()
             return Observable.create<RenderModel> { emitter ->
-                threadChecker.check("Need to subscribe on main thread.")
-
                 val runtime = FormulaRuntime(threadChecker, formula, childManagerFactory, emitter::onNext)
 
                 val disposables = CompositeDisposable()
                 disposables.add(input.subscribe({ input ->
-                    threadChecker.check("Input arrived on a wrong thread.")
                     runtime.onInput(input)
                 }, emitter::onError))
 
                 disposables.add(Disposables.fromRunnable {
-                    threadChecker.check("Need to unsubscribe on the main thread.")
-                    runtime.manager?.terminate()
+                    runtime.terminate()
                 })
 
                 emitter.setDisposable(disposables)
@@ -61,7 +57,13 @@ class FormulaRuntime<Input : Any, State, RenderModel : Any>(
 
     private var input: Input? = null
 
+    init {
+        threadChecker.check("Need to initialize on the main thread.")
+    }
+
     fun onInput(input: Input) {
+        threadChecker.check("Input arrived on a wrong thread.")
+
         val initialization = this.input == null
         this.input = input
 
@@ -133,5 +135,10 @@ class FormulaRuntime<Input : Any, State, RenderModel : Any>(
         if (hasInitialFinished && !isValid) {
             onRenderModel(checkNotNull(lastRenderModel))
         }
+    }
+
+    fun terminate() {
+        threadChecker.check("Need to unsubscribe on the main thread.")
+        manager?.terminate()
     }
 }
