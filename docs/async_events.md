@@ -81,7 +81,10 @@ class TaskFormula(val taskRepo: TaskRepo): Formula {
   ): Evaluation<RenderModel> {
     return Evaluation(
       updates = context.updates {
-        val fetchTask = RxStream.fromObservable(key = input.taskId) { taskRepo.fetchTask(input.taskId) }
+        val fetchTask = RxStream.fromObservable(key = input.taskId) { 
+          taskRepo.fetchTask(input.taskId) 
+        }
+        
         events(fetchTask) { taskResponse ->
           transition(state.copy(task = taskResponse))
         }
