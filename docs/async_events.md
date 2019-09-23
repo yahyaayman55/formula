@@ -138,7 +138,7 @@ class MyFormula(val networkStatus: NetworkStatusStream): Formula {
     return Evaluation(
       updates = context.updates {
         events(networkStatus) { status ->
-          val updated = status.copy(isOnline = status.isOnline)
+          val updated = state.copy(isOnline = status.isOnline)
           transition(updated)
         }
       }
