@@ -1,5 +1,5 @@
 Event handling in Formula is based on simple callback functions. Callbacks can have zero or 
-one parameter to pass data as part of the event.
+one parameter to pass data as part of the event. 
 
 ### UI Events
 To handle UI events, declare a function on the `Render Model` for each type of UI event you care about.
@@ -13,7 +13,8 @@ data class FormRenderModel(
 )
 ```
 
-All callbacks should be created within `Formula.evaluate` block.
+All callbacks should be created within `Formula.evaluate` block where we create the `FormRenderModel`. 
+
 ```kotlin
 override fun evaluate(input: Input, state: State, context: FormulaContext): ... {
   return Evaluation(
@@ -37,7 +38,16 @@ override fun evaluate(input: Input, state: State, context: FormulaContext): ... 
 }
 ```
 
-This example is dense, but it shows almost every kind of scenario. Let's go over it.
+This example is dense, but it shows almost every kind of scenario. Let's go over it. 
+
+We use `FormulaContext` to create the callbacks. `FormulaContext` is a special object tuat 
+
+| Callback type    | FormulaContext             |
+|------------------|----------------------------|
+| `() -> Unit`     | `context.callback {}`      |
+| `(Data) -> Unit` | `context.eventCallback {}` |
+
+
 
 To create a callback, we pass a function that returns a `Transition<State>`. Formula
 uses transitions to update internal state and/or perform side-effects to other components. 
