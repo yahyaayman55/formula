@@ -9,11 +9,7 @@ data class FlowState<Key>(
     val backStack: BackStack<Key> = BackStack.empty(),
     val states: Map<Key, KeyState<Key>> = emptyMap()
 ) {
-
-    fun update(state: KeyState<Key>): FlowState<Key> {
-        return copy(states = states.plus(state.key to state))
-    }
-
+    // TODO: this method should be driven by visible fragments
     fun lastEntry(): KeyState<Key>? {
         val currentKey = backStack.keys.lastOrNull()
         return currentKey?.let { states[it] }

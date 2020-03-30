@@ -4,6 +4,8 @@
 - Removed deprecated `state()` extension
 - Updated AndroidX appcompat to 1.1.0
 - Updated AndroidX fragment-ktx extensions to 1.2.1
+- Separated `FragmentFlowStore` and `FragmentFlowState` from `FlowStore` and `FlowState`.
+- Replaced `lastEntry()` with `visibleState()` in `FragmentFlowStore`.
 - Bugfix: Fix `Stream.onTerminate` causing illegal state exception.
 - **Breaking**: In formula-android, replacing lastEntry() with visibleState() in FragmentFlowState.
 

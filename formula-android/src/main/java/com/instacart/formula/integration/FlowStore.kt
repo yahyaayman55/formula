@@ -1,5 +1,10 @@
 package com.instacart.formula.integration
 
+import com.instacart.formula.Evaluation
+import com.instacart.formula.Formula
+import com.instacart.formula.FormulaContext
+import com.instacart.formula.integration.internal.BackStackUtils
+import com.instacart.formula.start
 import io.reactivex.Observable
 
 /**
@@ -16,9 +21,9 @@ import io.reactivex.Observable
  * ```
  */
 class FlowStore<Key : Any> constructor(
-    keyState: Observable<BackStack<Key>>,
+    private val keyState: Observable<BackStack<Key>>,
     private val root: Binding<Unit, Key>
-) {
+) : Formula<Unit, FlowState<Key>, FlowState<Key>> {
     companion object {
         inline fun <Key : Any> init(
             state: Observable<BackStack<Key>>,
@@ -45,19 +50,52 @@ class FlowStore<Key : Any> constructor(
         }
     }
 
-    private val reducerFactory = FlowReducers(root)
-    private val keyState = keyState.replay(1).refCount()
+    override fun initialState(input: Unit): FlowState<Key> = FlowState()
+
+    override fun evaluate(
+        input: Unit,
+        state: FlowState<Key>,
+        context: FormulaContext<FlowState<Key>>
+    ): Evaluation<FlowState<Key>> {
+        val rootInput = Binding.Input(
+            component = Unit,
+            activeKeys = state.backStack.keys,
+            onStateChanged = context.eventCallback {
+                transition(state.copy(states = state.states.plus(it.key to it)))
+            }
+        )
+        root.bind(context, rootInput)
+
+        return Evaluation(
+            renderModel = state,
+            updates = context.updates {
+                events(keyState) { keys ->
+                    val attachedKeys = BackStackUtils.findAttachedKeys(
+                        lastActive = state.backStack.keys,
+                        currentlyActive = keys.keys
+                    )
+
+                    val detached = BackStackUtils.findDetachedKeys(
+                        lastActive = state.backStack.keys,
+                        currentlyActive = keys.keys
+                    )
+
+                    // We want to emit an empty state update if key is not handled.
+                    val notHandled = attachedKeys
+                        .filter { !root.binds(it) }
+                        .map { Pair(it, KeyState(it, "missing-registration")) }
+
+                    val updated = state.copy(
+                        backStack = keys,
+                        states = state.states.minus(detached).plus(notHandled)
+                    )
+                    transition(updated)
+                }
+            }
+        )
+    }
 
     fun state(): Observable<FlowState<Key>> {
-        val backstackChangeReducer = keyState.map(reducerFactory::onBackstackChange)
-        val stateChangeReducers = root.state(Unit, keyState).map(reducerFactory::onScreenStateChanged)
-
-        val reducers = Observable.merge(backstackChangeReducer, stateChangeReducers)
-
-        return reducers
-            .scan(FlowState<Key>()) { state, reducer ->
-                reducer(state)
-            }
-            .distinctUntilChanged()
+        return start()
     }
 }

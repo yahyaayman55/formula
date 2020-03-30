@@ -41,7 +41,6 @@ class FlowStoreTest {
             }
             .assertValues(
                 expectedState(),
-                expectedState(Key.Main to null),
                 expectedState(Key.Main to "main-initial")
             )
     }
@@ -55,9 +54,7 @@ class FlowStoreTest {
             }
             .assertValues(
                 expectedState(),
-                expectedState(Key.Main to null),
                 expectedState(Key.Main to "main-initial"),
-                expectedState(Key.Main to "main-initial", Key.Detail to null),
                 expectedState(Key.Main to "main-initial", Key.Detail to "detail-initial"),
                 expectedState(Key.Main to "main-initial")
             )

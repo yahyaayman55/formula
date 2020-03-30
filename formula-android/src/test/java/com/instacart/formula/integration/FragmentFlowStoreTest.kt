@@ -105,6 +105,24 @@ class FragmentFlowStoreTest {
             }
     }
 
+    @Test fun `unsubscribe disposes of component`() {
+        val appComponent = AppComponent()
+        val store = createStore(appComponent)
+        store
+            .state()
+            .test()
+            .apply {
+                store.onLifecycleEffect(LifecycleEvent.Added(TestLoginFragmentContract()))
+            }
+            .apply {
+                assertThat(appComponent.initialized).hasSize(1)
+            }
+            .dispose()
+            .apply {
+                assertThat(appComponent.initialized).hasSize(0)
+            }
+    }
+
     fun createStore(component: AppComponent): FragmentFlowStore {
         return FragmentFlowStore.init(component) {
             bind(AuthFlowIntegration())

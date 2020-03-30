@@ -1,7 +1,6 @@
 package com.instacart.formula.fragment
 
 import android.view.View
-import com.instacart.formula.integration.BackStack
 import com.instacart.formula.integration.KeyState
 import com.instacart.formula.integration.LifecycleEvent
 import com.jakewharton.rxrelay2.PublishRelay
@@ -68,9 +67,7 @@ class FragmentFlowStoreTest {
             }
             .assertValues(
                 expectedState(),
-                expectedState(master to null),
                 expectedState(master to "master-1-state"),
-                expectedState(master to "master-1-state", detail to null),
                 expectedState(master to "master-1-state", detail to "detail-1-state"),
                 expectedState(master to "master-update", detail to "detail-1-state"),
                 expectedState(master to "master-update"),
@@ -87,11 +84,8 @@ class FragmentFlowStoreTest {
             }
             .assertValues(
                 expectedState(),
-                expectedState(Master(1) to null),
                 expectedState(Master(1) to "master-1-state"),
-                expectedState(Master(1) to "master-1-state", Detail(1) to null),
                 expectedState(Master(1) to "master-1-state", Detail(1) to "detail-1-state"),
-                expectedState(Master(1) to "master-1-state", Detail(1) to "detail-1-state", Detail(2) to null),
                 expectedState(
                     Master(1) to "master-1-state",
                     Detail(1) to "detail-1-state",
