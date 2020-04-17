@@ -58,6 +58,14 @@ abstract class ActivityStoreContext<out Activity : FragmentActivity> {
     ): Observable<Event>
 
     /**
+     * Selects a property from the current activity instance. This should be used
+     * for properties changed by configuration changes.
+     */
+    abstract fun <Property> selectActivityProperty(
+        select: Activity.() -> Property
+    ): Observable<Property>
+
+    /**
      * Performs an [effect] on the current activity instance. If there is no activity connected,
      * it will do nothing.
      */
