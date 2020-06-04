@@ -1,4 +1,4 @@
-package com.instacart.formula.stopwatch
+package com.instacart.formula.compose.stopwatch
 
 import android.view.ViewGroup
 import android.widget.Button

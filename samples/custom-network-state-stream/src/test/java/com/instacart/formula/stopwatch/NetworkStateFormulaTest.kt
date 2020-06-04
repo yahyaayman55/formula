@@ -2,7 +2,6 @@ package com.instacart.formula.stopwatch
 
 import com.google.common.truth.Truth.assertThat
 import com.instacart.formula.Cancelable
-import com.instacart.formula.Stream
 import com.instacart.formula.samples.networkstate.NetworkState
 import com.instacart.formula.samples.networkstate.NetworkStateFormula
 import com.instacart.formula.samples.networkstate.NetworkStateStream

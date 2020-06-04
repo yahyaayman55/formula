@@ -11,8 +11,8 @@ android {
     compileSdkVersion androidCompileSdkVersion
 
     defaultConfig {
-        applicationId "com.instacart.formula.stopwatch"
-        minSdkVersion minSdk
+        applicationId "com.instacart.formula.compose.stopwatch"
+        minSdkVersion 21
         targetSdkVersion targetSdk
         versionCode 1
         versionName "1.0"
@@ -25,7 +25,6 @@ android {
     }
 
     // Set both the Java and Kotlin compilers to target Java 8.
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -66,6 +65,7 @@ dependencies {
     implementation 'androidx.ui:ui-tooling:0.1.0-dev10'
     implementation 'androidx.ui:ui-layout:0.1.0-dev10'
     implementation 'androidx.ui:ui-material:0.1.0-dev10'
+    implementation 'androidx.ui:ui-rxjava2:0.1.0-dev10'
 
     testImplementation libraries.junit
     testImplementation "com.google.truth:truth:$truthVersion"

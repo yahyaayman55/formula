@@ -1,4 +1,4 @@
-package com.instacart.formula.stopwatch
+package com.instacart.formula.compose.stopwatch
 
 data class StopwatchRenderModel(
     val timePassed: String,

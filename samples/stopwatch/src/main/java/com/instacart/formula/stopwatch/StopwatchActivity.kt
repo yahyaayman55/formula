@@ -1,8 +1,7 @@
-package com.instacart.formula.stopwatch
+package com.instacart.formula.`stopwatch-compose`
 
 import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
-import com.instacart.formula.start
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 

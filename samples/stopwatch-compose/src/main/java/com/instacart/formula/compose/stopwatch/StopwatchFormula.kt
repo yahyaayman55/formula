@@ -1,4 +1,4 @@
-package com.instacart.formula.stopwatch
+package com.instacart.formula.compose.stopwatch
 
 import com.instacart.formula.Evaluation
 import com.instacart.formula.Formula
