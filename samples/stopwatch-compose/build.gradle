@@ -9,13 +9,34 @@ androidExtensions {
 
 android {
     compileSdkVersion androidCompileSdkVersion
+
     defaultConfig {
-        applicationId "com.examples.todoapp"
+        applicationId "com.instacart.formula.stopwatch"
         minSdkVersion minSdk
         targetSdkVersion targetSdk
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        // Enables Jetpack Compose for this module
+        compose true
+    }
+
+    // Set both the Java and Kotlin compilers to target Java 8.
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion "0.1.0-dev09"
     }
 
     buildTypes {
@@ -34,25 +55,24 @@ android {
 
 dependencies {
     implementation project(":formula")
-    implementation project(":formula-android")
-
-    implementation libraries.androidx.appcompat
-    implementation libraries.androidx.recyclerview
-    implementation libraries.androidx.constraintlayout
 
     implementation libraries.kotlin
+    implementation libraries.androidx.appcompat
     implementation libraries.rxrelays
+    implementation libraries.rxandroid
 
-    implementation libraries.androidx.lifecycle.extensions
+    // You also need to include the following Compose toolkit dependencies.
+    implementation 'androidx.ui:ui-framework:0.1.0-dev10'
+    implementation 'androidx.ui:ui-tooling:0.1.0-dev10'
+    implementation 'androidx.ui:ui-layout:0.1.0-dev10'
+    implementation 'androidx.ui:ui-material:0.1.0-dev10'
 
     testImplementation libraries.junit
     testImplementation "com.google.truth:truth:$truthVersion"
-    testImplementation "org.mockito:mockito-inline:$mockitoVersion"
-    testImplementation "com.nhaarman:mockito-kotlin:$mockitoKotlinVersion"
-    testImplementation project(":formula-test")
 
     testImplementation libraries.androidx.test.rules
     testImplementation libraries.androidx.test.runner
     testImplementation libraries.androidx.test.espresso.core
     testImplementation libraries.robolectric
+    testImplementation project(":formula-test")
 }

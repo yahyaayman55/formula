@@ -16,7 +16,7 @@ androidExtensions {
 }
 
 android {
-    compileSdkVersion compileSdk
+    compileSdkVersion androidCompileSdkVersion
 
     defaultConfig {
         minSdkVersion minSdk
