@@ -108,6 +108,7 @@ class FormulaRuntime<Input : Any, Output : Any>(
         }
         processingRequested = true
 
+        // Can we perform other formula state transitions without re-evaluation?
         if (!isValid) {
             val result: Evaluation<Output> =
                 localManager.evaluate(currentInput, processingPass)

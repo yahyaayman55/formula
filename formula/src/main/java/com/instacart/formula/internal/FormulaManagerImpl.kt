@@ -2,6 +2,7 @@ package com.instacart.formula.internal
 
 import com.instacart.formula.Evaluation
 import com.instacart.formula.Formula
+import com.instacart.formula.FormulaDelegate
 import com.instacart.formula.IFormula
 import com.instacart.formula.Transition
 
@@ -14,8 +15,8 @@ import com.instacart.formula.Transition
  * 3. Terminate removed children
  * 4. Prepare parent and alive children for updates.
  */
-internal class FormulaManagerImpl<Input, State : Any, Output>(
-    private val formula: Formula<Input, State, Output>,
+internal class FormulaManagerImpl<Input, State : Any, InternalInput, Output>(
+    private val formula: FormulaDelegate<Input, Output, InternalInput, State>,
     initialInput: Input,
     private val callbacks: ScopedCallbacks,
     private val transitionLock: TransitionLock,
@@ -23,7 +24,7 @@ internal class FormulaManagerImpl<Input, State : Any, Output>(
 ) : FormulaContextImpl.Delegate, FormulaManager<Input, Output> {
 
     constructor(
-        formula: Formula<Input, State, Output>,
+        formula: FormulaDelegate<Input, Output, InternalInput, State>,
         input: Input,
         transitionLock: TransitionLock,
         transitionListener: TransitionListener
@@ -35,7 +36,7 @@ internal class FormulaManagerImpl<Input, State : Any, Output>(
     private var frame: Frame<Input, State, Output>? = null
     private var terminated = false
 
-    private var state: State = formula.initialState(initialInput)
+    private var state: State = formula.initialState(formula.mapInput(initialInput))
     private var pendingRemoval: MutableList<FormulaManager<*, *>>? = null
 
     private fun handleTransition(transition: Transition<State>, wasChildInvalidated: Boolean) {
@@ -174,13 +175,21 @@ internal class FormulaManagerImpl<Input, State : Any, Output>(
         processingPass: Long
     ): ChildOutput {
         @Suppress("UNCHECKED_CAST")
-        val compositeKey = constructKey(formula, input)
+        val implementation = formula.implementation() as FormulaDelegate<ChildInput, ChildOutput, Any, Any>
+
+        // TODO: can we avoid creating an input every time child is called.
+        val internalInput = implementation.mapInput(input)
+        val compositeKey = FormulaKey(
+            type = formula.type(),
+            key = implementation.key(internalInput)
+        )
+
+        @Suppress("UNCHECKED_CAST")
         val manager = children
             .findOrInit(compositeKey) {
                 val childTransitionListener = TransitionListener { effects, isValid ->
                     handleTransition(Transition(effects = effects), !isValid)
                 }
-                val implementation = formula.implementation()
                 FormulaManagerImpl(implementation, input, transitionLock, childTransitionListener)
             }
             .requestAccess {
@@ -205,15 +214,5 @@ internal class FormulaManagerImpl<Input, State : Any, Output>(
     override fun terminate() {
         markAsTerminated()
         performTerminationSideEffects()
-    }
-
-    private fun <ChildInput, ChildOutput> constructKey(
-        formula: IFormula<ChildInput, ChildOutput>,
-        input: ChildInput
-    ): Any {
-        return FormulaKey(
-            type = formula.type(),
-            key = formula.implementation().key(input)
-        )
     }
 }
